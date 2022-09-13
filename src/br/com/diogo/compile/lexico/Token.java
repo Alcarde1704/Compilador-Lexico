@@ -1,18 +1,15 @@
 package br.com.diogo.compile.lexico;
+    
 
 public class Token {
 
-    public static final int TK_IDENTIFIER = 0;
-    public static final int TK_NUMBER = 1;
-    public static final int TK_OPERATOR = 2;
-    public static final int TK_PONCTUATION = 3;
-    public static final int TK_ASSIGN = 4;
-    public static final int TK_RESERVED_WORD = 5;
+    
 
-    private int type;
+
+    private enumTokens type;
     private String text;
 
-    public Token(int type, String text){
+    public Token(enumTokens type, String text){
         super();
         this.type = type;
         this.text = text;
@@ -23,11 +20,11 @@ public class Token {
         super();
     }
 
-    public int getType() {
+    public enumTokens getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(enumTokens type) {
         this.type = type;
     }
 
@@ -41,6 +38,6 @@ public class Token {
 
     @Override
     public String toString() {
-        return "Token [type=" + type + ", text= " + text +"]";
+        return "Token [type=" + type+ ", text= " + text +"]";
     }
 }

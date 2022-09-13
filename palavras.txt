@@ -1,0 +1,42 @@
+123
+
+abc123
+
+diogo
+
+if
+
+
+
+while
+
+
+
+for
+
+Diogo
+
+
+palavra >= 1
+
+Diogo123 > 5 != null
+
+>= .
+
+! 
+
+=
+
+String x
+
+STRING
+
+==
+
+()
+
+{}
+
+> ? 
+<
+

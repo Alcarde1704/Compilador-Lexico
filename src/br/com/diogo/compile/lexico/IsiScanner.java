@@ -60,7 +60,13 @@ public class IsiScanner {
             example.put(5, new String("String"));
             example.put(6, new String("null"));
             example.put(7, new String("int"));
-            example.put(8, new String("null"));
+            example.put(9, new String("float"));
+            example.put(10, new String("double"));
+            example.put(11, new String("boolean"));
+            example.put(12, new String("true"));
+            example.put(13, new String("false"));
+
+            
 
 
         } catch (Exception e){
@@ -72,7 +78,6 @@ public class IsiScanner {
     public Token nextToken(){
 
         char currentChar;
-        Token token;
         String term = "";
         
         estado = 0;
@@ -101,15 +106,13 @@ public class IsiScanner {
                 case 5:
 
                     term += q5(currentChar);
-
+                    break;
                 case 6:
-                    term += currentChar;
-                    token = new Token();
-                    token.setType(Token.TK_PONCTUATION);
-                    token.setText(term);
-                    return token;
+                    return q6(term);
                 case 7:
-                    return q7(currentChar, term);
+                    return q7(term);
+                case 8:
+                    return q8(term);
 
 
 
@@ -123,12 +126,19 @@ public class IsiScanner {
 
     }
 
-    public List<String> listaSimbolos(){
+    public ArrayList<String> listaSimbolos(){
 
         ArrayList<String> listaSimbolos = this.listaSimbolos;
 
         return listaSimbolos;
 
+    }
+
+
+
+
+    private boolean isGroup(char c){
+        return c == '(' || c == ')' || c == '[' || c == ']' || c == '{' || c == '}';
     }
 
     private boolean isPonctuation(char c){
@@ -162,6 +172,15 @@ public class IsiScanner {
         pos--;
     }
 
+
+
+
+
+
+
+
+
+
     private String q0(char currentChar){
         String termNovo = "";
         if (isChar(currentChar)){
@@ -183,8 +202,11 @@ public class IsiScanner {
         } else if (isPonctuation(currentChar)) {
             estado = 6;
             termNovo += currentChar;
+        } else if(isGroup(currentChar)) {
+            estado = 8;
+            termNovo += currentChar;
         } else {
-            throw new IsiLexicalException("Unrecognized SYMBOL");
+            throw new IsiLexicalException("Unrecognized SYMBOL: ");
         }
         return termNovo;
     }
@@ -200,7 +222,7 @@ public class IsiScanner {
             back();
             estado = 2;
         } else {
-            throw new IsiLexicalException("Malformed Identifier: " + termNovo);
+            throw new IsiLexicalException("Malformed Identifier: ");
         }
 
         return termNovo;
@@ -211,31 +233,121 @@ public class IsiScanner {
         Token token;
 
         Map<Integer, String> values = getExample();
+        ArrayList<String> listaSimbolos = listaSimbolos();
+
         boolean verificaPalavraReservada = false;
+        boolean verificaPalavraReservadaEscritaErrada = false;
+        boolean verificaListaSimbolos = false;
 
-                    for (Integer key : values.keySet()){
-                        String value = values.get(key);
-                        if (term.equals(value)){
-                            verificaPalavraReservada = true;
-                            break;
-                        }
-                    }
+        if(values.containsValue(term)){
+            verificaPalavraReservada = true;        
+        }
 
-                    if (verificaPalavraReservada){
-                        back();
-                        token = new Token();
-                        token.setType(Token.TK_RESERVED_WORD);
-                        token.setText(term);
-                        return token;
-                    } else {
-                        back();
-                        token = new Token();
-                        token.setType(Token.TK_IDENTIFIER);
-                        token.setText(term);
-                        listaSimbolos.add(term);
-                        return token;
+        if(listaSimbolos.contains(term)){
+            verificaListaSimbolos = true;
+        }
 
-                    }
+        for(Integer key : values.keySet()){
+            String value = values.get(key);
+            if(value.equalsIgnoreCase(term)){
+                verificaPalavraReservadaEscritaErrada = true;
+                break;
+            }
+        }
+
+        if (verificaPalavraReservada){
+            
+            if(term.equals("if")){
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_IF);
+                token.setText(term);
+                return token;
+            } else if(term.equals("else")){
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_ELSE);
+                token.setText(term);
+                return token;
+            } else if(term.equals("while")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_WHILE);
+                token.setText(term);
+                return token;
+            } else if(term.equals("for")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_FOR);
+                token.setText(term);
+                return token;
+            } else if(term.equals("do")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_DO);
+                token.setText(term);
+                return token;
+            } else if(term.equals("String")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_STRING);
+                token.setText(term);
+                return token;
+            } else if(term.equals("null")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_NULL);
+                token.setText(term);
+                return token;
+            } else if(term.equals("int")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_INT);
+                token.setText(term);
+                return token;
+            } else if(term.equals("float")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_FLOAT);
+                token.setText(term);
+                return token;
+            } else if(term.equals("double")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_DOUBLE);
+                token.setText(term);
+                return token;
+            } else if(term.equals("boolean")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_BOOLEAN);
+                token.setText(term);
+                return token;
+            } else if(term.equals("true")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_TRUE);
+                token.setText(term);
+                return token;
+            } else {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_FALSE);
+                token.setText(term);
+                return token;
+            } 
+
+        } else if(!verificaListaSimbolos && !verificaPalavraReservadaEscritaErrada){
+            back();
+            token = new Token();
+            token.setType(enumTokens.TK_IDENTIFIER);
+            token.setText(term);
+            listaSimbolos.add(term);
+            return token;
+
+        } else {
+            throw new IsiLexicalException("Identificador já utilizado ou escrito de forma errada");
+        }
 
 
     }
@@ -256,46 +368,92 @@ public class IsiScanner {
     private Token q4(String term){
 
         Token token = new Token();
-        token.setType(Token.TK_NUMBER);
+        token.setType(enumTokens.TK_NUMBER);
         token.setText(term);
         back();
         return token;
     }
 
     private String q5(char currentChar){
+
         
-        String termNovo = "";
+
+
+        String term = "";
         if (isOperator(currentChar)){
+            term += currentChar;
             estado = 5;
-            // termNovo += currentChar;
-        } else if(!isOperator(currentChar)) {
+        } else if ( isChar(currentChar) || isDigit(currentChar) || isSpace(currentChar)) {
             back();
             estado = 7;
-            termNovo += currentChar;
-            
+        } else {
+            throw new IsiLexicalException("Unregconized Operator");
         }
-        
-        return termNovo;
+        return term;
+
 
         
 
         
     }
 
-    private Token q7(char currentChar, String term){
+    private Token q6(String term){
+
         Token token;
 
-        
-        back();
         token = new Token();
-        token.setType(Token.TK_OPERATOR);
+        token.setType(enumTokens.TK_PONCTUATION);
         token.setText(term);
         return token;
         
+    }
+
+    private Token q7(String term){
+
+        if(term.equals("=")){
+            Token token = new Token();
+            token.setType(enumTokens.TK_ASSIGN);
+            token.setText(term);
+            back();
+            return token;
+        } else {
+            Token token = new Token();
+            token.setType(enumTokens.TK_OPERATOR);
+            token.setText(term);
+            back();
+            return token;
+        }
+        
         
 
         
 
+        
+    }
+
+    private Token q8(String term){
+
+        Token token;
+        
+        if( term.equals("(") || term.equals(")") ){
+            back();
+            token = new Token();
+            token.setType(enumTokens.TK_PARENTESES);
+            token.setText(term);
+            return token;
+        } else if(term.equals("[") || term.equals("]")){
+            back();
+            token = new Token();
+            token.setType(enumTokens.TK_COLCHETES);
+            token.setText(term);
+            return token;
+        } else {
+            back();
+            token = new Token();
+            token.setType(enumTokens.TK_CHAVES);
+            token.setText(term);
+            return token;
+        }
         
     }
     
