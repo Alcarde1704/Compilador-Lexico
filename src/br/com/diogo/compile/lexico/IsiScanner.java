@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class IsiScanner {
@@ -57,6 +58,9 @@ public class IsiScanner {
             example.put(3, new String("for"));
             example.put(4, new String("do"));
             example.put(5, new String("String"));
+            example.put(6, new String("null"));
+            example.put(7, new String("int"));
+            example.put(8, new String("null"));
 
 
         } catch (Exception e){
@@ -70,7 +74,7 @@ public class IsiScanner {
         char currentChar;
         Token token;
         String term = "";
-        Map<Integer, String> values = getExample();
+        
         estado = 0;
         while (true) {
             if (isEOF()){
@@ -79,83 +83,24 @@ public class IsiScanner {
             currentChar = nextChar();
             switch (estado){
                 case 0:
-                    term += q0(currentChar, term);
+                    term += q0(currentChar);
                     break;
                 case 1:
-                    if (isChar(currentChar) || isDigit(currentChar) ){
-                        term += currentChar;
-                        estado = 1;
-                    } else if (isSpace(currentChar) || isOperator(currentChar) || isPonctuation(currentChar)){
-                        back();
-                        estado = 2;
-                    } else {
-                        throw new IsiLexicalException("Malformed Identifier: " + term);
-                    }
+                    term += q1(currentChar);
                     break;
                 case 2:
-                    boolean verificaPalavraReservada = false;
-
-                    for (Integer key : values.keySet()){
-                        String value = values.get(key);
-                        System.out.println(value);
-                        System.out.println(term);
-                        if (term.equals(value)){
-                            verificaPalavraReservada = true;
-                            break;
-                        }
-                    }
-
-                    if (verificaPalavraReservada){
-                        System.out.println(term);
-                        back();
-                        token = new Token();
-                        token.setType(Token.TK_RESERVED_WORD);
-                        token.setText(term);
-                        return token;
-                    } else {
-                        System.out.println(term);
-                        back();
-                        token = new Token();
-                        token.setType(Token.TK_IDENTIFIER);
-                        token.setText(term);
-                        listaSimbolos.add(term);
-                        return token;
-
-                    }
-
+                    return q2(term);
+                    
                 case 3:
-                    if (isDigit(currentChar)){
-                        term += currentChar;
-                        estado = 3;
-                    } else if (!isChar(currentChar)){
-                        estado = 4;
-                    } else {
-                        throw new IsiLexicalException("Unrecognized Number");
-                    }
+                    term += q3(currentChar);
                     break;
                 case 4:
 
-
-                    token = new Token();
-                    token.setType(Token.TK_NUMBER);
-                    token.setText(term);
-                    back();
-                    return token;
+                    return q4(term);
+                    
                 case 5:
 
-                    if (!isOperator(currentChar)){
-                        back();
-                        token = new Token();
-                        token.setType(Token.TK_OPERATOR);
-                        token.setText(term);
-                        return token;
-                    } else if (isOperator(currentChar)){
-                        token = new Token();
-                        term += currentChar;
-                        token.setType(Token.TK_OPERATOR);
-                        token.setText(term);
-                        return token;
-                    }
+                    term += q5(currentChar);
 
                 case 6:
                     term += currentChar;
@@ -163,6 +108,8 @@ public class IsiScanner {
                     token.setType(Token.TK_PONCTUATION);
                     token.setText(term);
                     return token;
+                case 7:
+                    return q7(currentChar, term);
 
 
 
@@ -176,8 +123,16 @@ public class IsiScanner {
 
     }
 
+    public List<String> listaSimbolos(){
+
+        ArrayList<String> listaSimbolos = this.listaSimbolos;
+
+        return listaSimbolos;
+
+    }
+
     private boolean isPonctuation(char c){
-        return c == ';';
+        return c == ';' || c == '.' || c == ',' || c == ':' || c == '?';
     }
     private boolean isDigit(char c){
         return c >= '0' && c <= '9';
@@ -207,7 +162,7 @@ public class IsiScanner {
         pos--;
     }
 
-    private String q0(char currentChar, String term){
+    private String q0(char currentChar){
         String termNovo = "";
         if (isChar(currentChar)){
             estado = 1;
@@ -222,7 +177,6 @@ public class IsiScanner {
 
 
         } else if (isOperator(currentChar)) {
-
             estado = 5;
             termNovo += currentChar;
 
@@ -234,5 +188,116 @@ public class IsiScanner {
         }
         return termNovo;
     }
+
+
+    private String q1(char currentChar){
+        String termNovo = "";
+
+        if (isChar(currentChar) || isDigit(currentChar) ){
+            termNovo += currentChar;
+            estado = 1;
+        } else if (isSpace(currentChar) || isOperator(currentChar) || isPonctuation(currentChar)){
+            back();
+            estado = 2;
+        } else {
+            throw new IsiLexicalException("Malformed Identifier: " + termNovo);
+        }
+
+        return termNovo;
+
+    }
+
+    private Token q2(String term){
+        Token token;
+
+        Map<Integer, String> values = getExample();
+        boolean verificaPalavraReservada = false;
+
+                    for (Integer key : values.keySet()){
+                        String value = values.get(key);
+                        if (term.equals(value)){
+                            verificaPalavraReservada = true;
+                            break;
+                        }
+                    }
+
+                    if (verificaPalavraReservada){
+                        back();
+                        token = new Token();
+                        token.setType(Token.TK_RESERVED_WORD);
+                        token.setText(term);
+                        return token;
+                    } else {
+                        back();
+                        token = new Token();
+                        token.setType(Token.TK_IDENTIFIER);
+                        token.setText(term);
+                        listaSimbolos.add(term);
+                        return token;
+
+                    }
+
+
+    }
+
+    private String q3(char currentChar){
+        String term = "";
+        if (isDigit(currentChar)){
+            term += currentChar;
+            estado = 3;
+        } else if (!isChar(currentChar)){
+            estado = 4;
+        } else {
+            throw new IsiLexicalException("Unrecognized Number");
+        }
+        return term;
+    }
+
+    private Token q4(String term){
+
+        Token token = new Token();
+        token.setType(Token.TK_NUMBER);
+        token.setText(term);
+        back();
+        return token;
+    }
+
+    private String q5(char currentChar){
+        
+        String termNovo = "";
+        if (isOperator(currentChar)){
+            estado = 5;
+            // termNovo += currentChar;
+        } else if(!isOperator(currentChar)) {
+            back();
+            estado = 7;
+            termNovo += currentChar;
+            
+        }
+        
+        return termNovo;
+
+        
+
+        
+    }
+
+    private Token q7(char currentChar, String term){
+        Token token;
+
+        
+        back();
+        token = new Token();
+        token.setType(Token.TK_OPERATOR);
+        token.setText(term);
+        return token;
+        
+        
+
+        
+
+        
+    }
+    
 
 }

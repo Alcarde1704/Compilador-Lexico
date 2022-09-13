@@ -16,6 +16,8 @@ public class MainClass {
                     System.out.println(token);
                 }
             } while (token != null);
+
+            System.out.println(sc.listaSimbolos());
         } catch (IsiLexicalException ex){
             System.out.println("Lexical ERROR " + ex.getMessage());
         }
