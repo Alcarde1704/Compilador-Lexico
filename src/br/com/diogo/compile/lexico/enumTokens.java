@@ -27,6 +27,8 @@ public enum enumTokens {
     TK_PONTO_VIRGULA,
     TK_VIRGULA,
     TK_INTERROGACAO,
+    TK_PONTO,
+    TK_DOIS_PONTOS,
     
     TK_PARENTESES,
     TK_COLCHETES,

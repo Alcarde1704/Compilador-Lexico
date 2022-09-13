@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class IsiScanner {
@@ -38,11 +37,11 @@ public class IsiScanner {
             String txtConteudo = "";
             String linha;
 
-            BufferedReader br = new BufferedReader(new FileReader(filename));
-
-            while ((linha = br.readLine()) != null){
-                txtConteudo += linha;
-                txtConteudo += "\n";
+            try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+                while ((linha = br.readLine()) != null){
+                    txtConteudo += linha;
+                    txtConteudo += "\n";
+                }
             }
 
             System.out.println("DEBUG -------");
@@ -358,6 +357,7 @@ public class IsiScanner {
             term += currentChar;
             estado = 3;
         } else if (!isChar(currentChar)){
+            back();
             estado = 4;
         } else {
             throw new IsiLexicalException("Unrecognized Number");
@@ -401,10 +401,32 @@ public class IsiScanner {
 
         Token token;
 
-        token = new Token();
-        token.setType(enumTokens.TK_PONCTUATION);
-        token.setText(term);
-        return token;
+        if(term.equals(";")){
+            token = new Token();
+            token.setType(enumTokens.TK_PONTO_VIRGULA);
+            token.setText(term);
+            return token;
+        } else if (term.equals("?")){
+            token = new Token();
+            token.setType(enumTokens.TK_INTERROGACAO);
+            token.setText(term);
+            return token;
+        } else if (term.equals(".")){
+            token = new Token();
+            token.setType(enumTokens.TK_PONTO);
+            token.setText(term);
+            return token;
+        } else if(term.equals(",")) {
+            token = new Token();
+            token.setType(enumTokens.TK_VIRGULA);
+            token.setText(term);
+            return token;
+        } else {
+            token = new Token();
+            token.setType(enumTokens.TK_DOIS_PONTOS);
+            token.setText(term);
+            return token;
+        }
         
     }
 
