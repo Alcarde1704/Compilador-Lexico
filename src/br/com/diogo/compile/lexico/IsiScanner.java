@@ -64,6 +64,10 @@ public class IsiScanner {
             example.put(11, new String("boolean"));
             example.put(12, new String("true"));
             example.put(13, new String("false"));
+            example.put(14, new String("void"));
+            example.put(15, new String("main"));
+            example.put(16, new String("return"));
+            example.put(17, new String("print"));
 
             
 
@@ -112,6 +116,11 @@ public class IsiScanner {
                     return q7(term);
                 case 8:
                     return q8(term);
+                case 9:
+                    term += q9(currentChar);
+                    break;
+                case 10:
+                    return q10(term);
 
 
 
@@ -134,6 +143,9 @@ public class IsiScanner {
     }
 
 
+    private boolean isOperatorMath(char c){
+        return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
+    }
 
 
     private boolean isGroup(char c){
@@ -204,6 +216,9 @@ public class IsiScanner {
         } else if(isGroup(currentChar)) {
             estado = 8;
             termNovo += currentChar;
+        }   else if(isOperatorMath(currentChar)) {
+            estado = 9;
+            termNovo += currentChar;
         } else {
             throw new IsiLexicalException("Unrecognized SYMBOL: ");
         }
@@ -217,7 +232,7 @@ public class IsiScanner {
         if (isChar(currentChar) || isDigit(currentChar) ){
             termNovo += currentChar;
             estado = 1;
-        } else if (isSpace(currentChar) || isOperator(currentChar) || isPonctuation(currentChar)){
+        } else if (isSpace(currentChar) || isOperator(currentChar) || isPonctuation(currentChar) || isOperatorMath(currentChar) || isGroup(currentChar)){
             back();
             estado = 2;
         } else {
@@ -253,6 +268,8 @@ public class IsiScanner {
                 break;
             }
         }
+
+       
 
         if (verificaPalavraReservada){
             
@@ -328,6 +345,24 @@ public class IsiScanner {
                 token.setType(enumTokens.TK_RESERVED_WORD_TRUE);
                 token.setText(term);
                 return token;
+            } else if(term.equals("void")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_VOID);
+                token.setText(term);
+                return token;
+            } else if(term.equals("main")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_MAIN);
+                token.setText(term);
+                return token;
+            } else if(term.equals("return")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_RETURN);
+                token.setText(term);
+                return token;
             } else {
                 back();
                 token = new Token();
@@ -336,7 +371,15 @@ public class IsiScanner {
                 return token;
             } 
 
+        } else if(verificaListaSimbolos && !verificaPalavraReservadaEscritaErrada){
+            back();
+            token = new Token();
+            token.setType(enumTokens.TK_IDENTIFIER);
+            token.setText(term);
+            return token;
+
         } else if(!verificaListaSimbolos && !verificaPalavraReservadaEscritaErrada){
+
             back();
             token = new Token();
             token.setType(enumTokens.TK_IDENTIFIER);
@@ -477,6 +520,75 @@ public class IsiScanner {
             return token;
         }
         
+    }
+
+    private String q9(char currentChar){
+
+
+        String term = "";
+
+        if (isOperatorMath(currentChar)){
+            term += currentChar;
+            estado = 9;
+        } else if (!isOperatorMath(currentChar)){
+            back();
+            estado = 10;
+        } else {
+            throw new IsiLexicalException("Unrecognized Number");
+        }
+
+        return term;
+
+    }
+
+    private Token q10(String term){
+
+        Token token;
+
+        if(term.equals("+")){
+            
+            token = new Token();
+            token.setType(enumTokens.TK_OPERADOR_SOMA);
+            token.setText(term);
+            return token;
+        } else if(term.equals("++")) {
+            
+            token = new Token();
+            token.setType(enumTokens.TK_OPERADOR_SOMA);
+            token.setText(term);
+            return token;
+        }else if(term.equals("-")) {
+            
+            token = new Token();
+            token.setType(enumTokens.TK_OPERADOR_SUBTRACAO);
+            token.setText(term);
+            return token;
+        } else if(term.equals("--")) {
+            
+            token = new Token();
+            token.setType(enumTokens.TK_OPERADOR_SUBTRACAO);
+            token.setText(term);
+            return token;
+        }else if(term.equals("*")){
+            
+            token = new Token();
+            token.setType(enumTokens.TK_OPERADOR_MULTIPLICACAO);
+            token.setText(term);
+            return token;
+        } else if(term.equals("/")){
+            
+            token = new Token();
+            token.setType(enumTokens.TK_OPERADOR_DIVISAO);
+            token.setText(term);
+            return token;
+        } else {
+            
+            token = new Token();
+            token.setType(enumTokens.TK_OPERADOR_PORCENTAGEM);
+            token.setText(term);
+            return token;
+        }
+
     }
     
 
