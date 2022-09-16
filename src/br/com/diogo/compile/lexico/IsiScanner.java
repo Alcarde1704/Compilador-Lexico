@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class IsiScanner {
@@ -14,23 +15,93 @@ public class IsiScanner {
     private int    estado;
     private int    pos;
 
+    ArrayList<String> listaSimbolos = new ArrayList<>();
+
+    String[] palavrasReservadasArray = new String[]{"if", "else",""};
+
+
+    public ArrayList<String> listaSimbolos(){
+
+        ArrayList<String> listaSimbolos = this.listaSimbolos;
+
+        return listaSimbolos;
+
+    }
+
+
+    private boolean isOperatorMath(char c){
+        return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
+    }
+
+
+    private boolean isGroup(char c){
+        return c == '(' || c == ')' || c == '[' || c == ']' || c == '{' || c == '}';
+    }
+
+    private boolean isPonctuation(char c){
+        return c == ';' || c == '.' || c == ',' || c == ':' || c == '?' || c ==  '\"' || c == '\'' || c == '#';
+    }
+    private boolean isDigit(char c){
+        return c >= '0' && c <= '9';
+    } 
+
+    private boolean isChar(char c){
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '$' || c == '\\';
+    }
+
+    private boolean isOperator(char c){
+        return c == '>' || c == '<' || c == '=' || c == '!';
+    }
+
+    private boolean isLogicOperator(char c){
+        return c == '&' || c == '|'; 
+    }
+
+    private boolean isSpace(char c){
+        return c == ' ' || c == '\t' || c == '\n' || c == '\r';
+    }
+
+    private char nextChar(){
+        return content[pos++];
+    }
+
+    private boolean isEOF(){
+        return pos == content.length;
+    }
+
+    private void back(){
+        pos--;
+    }
+
+
+
+
     private int initialSize = 16;
 
     private double loadFactor = 0.75;
 
     double sizeToRehash = initialSize * loadFactor;
 
-    private Map<Integer, String> example = new HashMap<Integer, String>();
+    private Map<Integer, String> palavrasReservadas = new HashMap<Integer, String>();
 
-    public void setExample(Map<Integer, String> example) {
-        this.example = example;
+    public void setpalavrasReservadas(Map<Integer, String> palavrasReservadas) {
+        this.palavrasReservadas = palavrasReservadas;
     }
 
-    public Map<Integer, String> getExample() {
-        return example;
+    public Map<Integer, String> getpalavrasReservadas() {
+        return palavrasReservadas;
     }
 
-    ArrayList<String> listaSimbolos = new ArrayList<>();
+    private void adicionaPalavraReservada(String[] palavraReservada){
+        
+        for(String palavra : palavraReservada){
+            int posicao = palavrasReservadas.size() + 1;
+            palavrasReservadas.put(posicao, new String(palavra));
+        }
+
+    }
+
+    
     public IsiScanner(String filename){
 
         try {
@@ -51,23 +122,37 @@ public class IsiScanner {
             pos = 0;
             System.out.println(content);
 
-            example.put(0, new String("if"));
-            example.put(1, new String("else"));
-            example.put(2, new String("while"));
-            example.put(3, new String("for"));
-            example.put(4, new String("do"));
-            example.put(5, new String("String"));
-            example.put(6, new String("null"));
-            example.put(7, new String("int"));
-            example.put(9, new String("float"));
-            example.put(10, new String("double"));
-            example.put(11, new String("boolean"));
-            example.put(12, new String("true"));
-            example.put(13, new String("false"));
-            example.put(14, new String("void"));
-            example.put(15, new String("main"));
-            example.put(16, new String("return"));
-            example.put(17, new String("print"));
+            
+            adicionaPalavraReservada(palavrasReservadasArray);
+
+            
+            // adicionaPalavraReservada("if");
+            // example.put(1, new String("else"));
+            // example.put(2, new String("while"));
+            // example.put(3, new String("for"));
+            // example.put(4, new String("do"));
+            // example.put(5, new String("String"));
+            // example.put(6, new String("null"));
+            // example.put(7, new String("int"));
+            // example.put(9, new String("float"));
+            // example.put(10, new String("double"));
+            // example.put(11, new String("boolean"));
+            // example.put(12, new String("true"));
+            // example.put(13, new String("false"));
+            // example.put(14, new String("void"));
+            // example.put(15, new String("main"));
+            // example.put(16, new String("return"));
+            // example.put(17, new String("print"));
+            // example.put(18, new String("function"));
+            // example.put(19, new String("$"));
+            // example.put(20, new String("var"));
+            // example.put(21, new String("cout"));
+            // example.put(22, new String("include"));
+            // example.put(23, new String("\\n"));
+            // example.put(24, new String("var"));
+            // example.put(25, new String("cout"));
+            // example.put(26, new String("include"));
+            // example.put(27, new String("\\n"));
 
             
 
@@ -121,8 +206,11 @@ public class IsiScanner {
                     break;
                 case 10:
                     return q10(term);
-
-
+                case 11:
+                    term += q11(currentChar);
+                    break;
+                case 12:
+                    return q12(term);
 
             }
 
@@ -134,54 +222,7 @@ public class IsiScanner {
 
     }
 
-    public ArrayList<String> listaSimbolos(){
-
-        ArrayList<String> listaSimbolos = this.listaSimbolos;
-
-        return listaSimbolos;
-
-    }
-
-
-    private boolean isOperatorMath(char c){
-        return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
-    }
-
-
-    private boolean isGroup(char c){
-        return c == '(' || c == ')' || c == '[' || c == ']' || c == '{' || c == '}';
-    }
-
-    private boolean isPonctuation(char c){
-        return c == ';' || c == '.' || c == ',' || c == ':' || c == '?';
-    }
-    private boolean isDigit(char c){
-        return c >= '0' && c <= '9';
-    }
-
-    private boolean isChar(char c){
-        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
-    }
-
-    private boolean isOperator(char c){
-        return c == '>' || c == '<' || c == '=' || c == '!';
-    }
-
-    private boolean isSpace(char c){
-        return c == ' ' || c == '\t' || c == '\n' || c == '\r';
-    }
-
-    private char nextChar(){
-        return content[pos++];
-    }
-
-    private boolean isEOF(){
-        return pos == content.length;
-    }
-
-    private void back(){
-        pos--;
-    }
+    
 
 
 
@@ -219,6 +260,9 @@ public class IsiScanner {
         }   else if(isOperatorMath(currentChar)) {
             estado = 9;
             termNovo += currentChar;
+        }   else if(isLogicOperator(currentChar)) {
+            estado = 11;
+            termNovo += currentChar;
         } else {
             throw new IsiLexicalException("Unrecognized SYMBOL: ");
         }
@@ -243,10 +287,12 @@ public class IsiScanner {
 
     }
 
+    
+
     private Token q2(String term){
         Token token;
 
-        Map<Integer, String> values = getExample();
+        Map<Integer, String> values = getpalavrasReservadas();
         ArrayList<String> listaSimbolos = listaSimbolos();
 
         boolean verificaPalavraReservada = false;
@@ -363,6 +409,42 @@ public class IsiScanner {
                 token.setType(enumTokens.TK_RESERVED_WORD_RETURN);
                 token.setText(term);
                 return token;
+            } else if(term.equals("function")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_FUNCTION);
+                token.setText(term);
+                return token;
+            }   else if(term.equals("$")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_$);
+                token.setText(term);
+                return token;
+            }   else if(term.equals("var")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_VAR);
+                token.setText(term);
+                return token;
+            }   else if(term.equals("cout")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_COUT);
+                token.setText(term);
+                return token;
+            } else if(term.equals("include")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_INCLUDE);
+                token.setText(term);
+                return token;
+            } else if(term.equals("\\n")) {
+                back();
+                token = new Token();
+                token.setType(enumTokens.TK_RESERVED_WORD_BARRA_N);
+                token.setText(term);
+                return token;
             } else {
                 back();
                 token = new Token();
@@ -464,6 +546,16 @@ public class IsiScanner {
             token.setType(enumTokens.TK_VIRGULA);
             token.setText(term);
             return token;
+        }   else if(term.equals("\"")) {
+            token = new Token();
+            token.setType(enumTokens.TK_ASPAS_DUPLA);
+            token.setText(term);
+            return token;
+        }  else if(term.equals("\'")) {
+            token = new Token();
+            token.setType(enumTokens.TK_ASPAS_SIMPLES);
+            token.setText(term);
+            return token;
         } else {
             token = new Token();
             token.setType(enumTokens.TK_DOIS_PONTOS);
@@ -550,46 +642,91 @@ public class IsiScanner {
             token = new Token();
             token.setType(enumTokens.TK_OPERADOR_SOMA);
             token.setText(term);
+            back();
             return token;
         } else if(term.equals("++")) {
             
             token = new Token();
             token.setType(enumTokens.TK_OPERADOR_SOMA);
             token.setText(term);
+            back();
             return token;
         }else if(term.equals("-")) {
             
             token = new Token();
             token.setType(enumTokens.TK_OPERADOR_SUBTRACAO);
             token.setText(term);
+            back();
             return token;
         } else if(term.equals("--")) {
             
             token = new Token();
             token.setType(enumTokens.TK_OPERADOR_SUBTRACAO);
             token.setText(term);
+            back();
             return token;
         }else if(term.equals("*")){
             
             token = new Token();
             token.setType(enumTokens.TK_OPERADOR_MULTIPLICACAO);
             token.setText(term);
+            back();
             return token;
         } else if(term.equals("/")){
             
             token = new Token();
             token.setType(enumTokens.TK_OPERADOR_DIVISAO);
             token.setText(term);
+            back();
             return token;
         } else {
             
             token = new Token();
             token.setType(enumTokens.TK_OPERADOR_PORCENTAGEM);
             token.setText(term);
+            back();
             return token;
         }
 
     }
-    
 
+    private String q11(char currentChar){
+        String termNovo = "";
+
+        if(isLogicOperator(currentChar)){
+            termNovo += currentChar;
+            estado = 11;
+        } else if(isSpace(currentChar) || isDigit(currentChar) || isChar(currentChar)){
+            back();
+            estado = 12;
+        } else {
+            throw new IsiLexicalException("Incorrect Logic Operator");
+        }
+
+        return termNovo;
+
+    }
+
+
+    private Token q12(String term){
+
+        Token token;
+
+        if(term.equals("&&")){
+            token = new Token();
+            token.setText(term);
+            token.setType(enumTokens.TK_OPERADOR_AND);
+            back();
+            return token;
+        } else {
+            token = new Token();
+            token.setText(term);
+            token.setType(enumTokens.TK_OPERADOR_OR);
+            back();
+            return token;
+        } 
+        
+    
+    }
 }
+
