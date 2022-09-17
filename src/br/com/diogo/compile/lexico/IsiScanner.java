@@ -17,7 +17,15 @@ public class IsiScanner {
 
     ArrayList<String> listaSimbolos = new ArrayList<>();
 
-    String[] palavrasReservadasArray = new String[]{"if", "else",""};
+    String[] palavrasReservadasArray = new String[]{"template","break","enum","private","this","case",
+                                                    "extern","protected","throw","catch","float","public",
+                                                    "try","char","for","register","typedef","class","friend",
+                                                    "return","union","const","goto","short","unsigned","continue",
+                                                    "if","signed","virtual","default","inline","sizeof","void","delete",
+                                                    "int","static","volatile","do","long","struct","while", "if", "else", 
+                                                    "while", "for", "do", "String", "null", "int", "float", "double", "boolean", 
+                                                    "true", "false", "void", "main", "return", "print", "function", "$", "var", 
+                                                    "cout", "include", "\\n", "var", "cout", "include"};
 
 
     public ArrayList<String> listaSimbolos(){
@@ -32,6 +40,10 @@ public class IsiScanner {
     private boolean isOperatorMath(char c){
         return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
     }
+
+    // private boolean isFunction(char c){
+    //     return c == ''
+    // }
 
 
     private boolean isGroup(char c){
@@ -556,7 +568,12 @@ public class IsiScanner {
             token.setType(enumTokens.TK_ASPAS_SIMPLES);
             token.setText(term);
             return token;
-        } else {
+        } else if(term.equals("#")) {
+            token = new Token();
+            token.setType(enumTokens.TK_HASHTAG);
+            token.setText(term);
+            return token;
+        }else {
             token = new Token();
             token.setType(enumTokens.TK_DOIS_PONTOS);
             token.setText(term);
