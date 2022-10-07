@@ -17,14 +17,8 @@ public class IsiScanner {
 
     ArrayList<String> listaSimbolos = new ArrayList<>();
 
-    String[] palavrasReservadasArray = new String[]{"template","break","enum","private","this","case",
-                                                    "extern","protected","throw","catch","float","public",
-                                                    "try","char","for","register","typedef","class","friend",
-                                                    "return","union","const","goto","short","unsigned","continue",
-                                                    "if","signed","virtual","default","inline","sizeof","void","delete",
-                                                    "int","static","volatile","do","long","struct","while", "if", "else", 
-                                                    "while", "for", "do", "String", "null", "int", "float", "double", "boolean", 
-                                                    "true", "false", "void", "main", "return", "print", "function", "$", "var", 
+    String[] palavrasReservadasArray = new String[]{"if", "else", "while", "for", "do", "String", "null", "int", "float", "double", "boolean",
+                                                    "true", "false", "void", "main", "return", "function", "$", "var",
                                                     "cout", "include", "\\n", "var", "cout", "include"};
 
 
@@ -105,7 +99,7 @@ public class IsiScanner {
     }
 
     private void adicionaPalavraReservada(String[] palavraReservada){
-        
+
         for(String palavra : palavraReservada){
             int posicao = palavrasReservadas.size() + 1;
             palavrasReservadas.put(posicao, new String(palavra));
@@ -137,34 +131,6 @@ public class IsiScanner {
             
             adicionaPalavraReservada(palavrasReservadasArray);
 
-            
-            // adicionaPalavraReservada("if");
-            // example.put(1, new String("else"));
-            // example.put(2, new String("while"));
-            // example.put(3, new String("for"));
-            // example.put(4, new String("do"));
-            // example.put(5, new String("String"));
-            // example.put(6, new String("null"));
-            // example.put(7, new String("int"));
-            // example.put(9, new String("float"));
-            // example.put(10, new String("double"));
-            // example.put(11, new String("boolean"));
-            // example.put(12, new String("true"));
-            // example.put(13, new String("false"));
-            // example.put(14, new String("void"));
-            // example.put(15, new String("main"));
-            // example.put(16, new String("return"));
-            // example.put(17, new String("print"));
-            // example.put(18, new String("function"));
-            // example.put(19, new String("$"));
-            // example.put(20, new String("var"));
-            // example.put(21, new String("cout"));
-            // example.put(22, new String("include"));
-            // example.put(23, new String("\\n"));
-            // example.put(24, new String("var"));
-            // example.put(25, new String("cout"));
-            // example.put(26, new String("include"));
-            // example.put(27, new String("\\n"));
 
             
 
